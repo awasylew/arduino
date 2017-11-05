@@ -19,8 +19,9 @@
 #include <DallasTemperature.h>
 
 //AP definitions
-#define AP_SSID "5thElement"
-#define AP_PASSWORD "xxx"
+//#define AP_SSID "5thElement"
+//#define AP_PASSWORD "xxx"
+#include "AP.h"
 
 // EasyIoT server definitions
 // #define EIOT_USERNAME    "admin"
@@ -81,21 +82,35 @@ void loop() {
 
 void wifiConnect()
 {
+    Serial.print("is connected: ");
+    Serial.println(WiFi.isConnected());
     Serial.print("Connecting to AP");
+    Serial.println(AP_SSID);
+    Serial.println(AP_PASSWORD);
     WiFi.begin(AP_SSID, AP_PASSWORD);
-    while (WiFi.status() != WL_CONNECTED) {
-    delay(1000);
-    Serial.print(".");
-  }
+    int status;
+    while ((status = WiFi.status()) != WL_CONNECTED) {
+      delay(50);
+      Serial.print("[");
+      Serial.print(status);
+      Serial.print("]");
+    Serial.print("is connected: ");
+    Serial.println(WiFi.isConnected());
+    }
 
   Serial.println("");
   Serial.println("WiFi connected");
+    Serial.print("is connected: ");
+    Serial.println(WiFi.isConnected());
 }
 
 void sendTeperature(float temp)
 {
 
    WiFiClient client;
+
+   wifiConnect();   // dodatkowe!!!
+
 
    while(!client.connect(EIOT_IP_ADDRESS, EIOT_PORT)) {
     Serial.println("connection failed");
@@ -124,4 +139,11 @@ void sendTeperature(float temp)
 
   Serial.println();
   Serial.println("Connection closed");
+
+    Serial.print("is connected: ");
+    Serial.println(WiFi.isConnected());
+   WiFi.disconnect();
+    Serial.print("is connected: ");
+    Serial.println(WiFi.isConnected());
+
 }
