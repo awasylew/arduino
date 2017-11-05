@@ -103,7 +103,7 @@ void sendTeperature(float temp)
   }
 
   String url = "";
-  url += "/pings-post?time=0&origin=ESP&target=fake&success=true&rtt=" + String(temp);
+  url += "/pings-post?time=now&origin=ESP&target=fake&success=true&rtt=" + String(temp);
 
   Serial.print("POST data to URL: ");
   Serial.println(url);
