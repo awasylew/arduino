@@ -35,7 +35,7 @@
 #define REPORT_INTERVAL 10 // in sec
 
 
-#define ONE_WIRE_BUS 2  // DS18B20 pin
+#define ONE_WIRE_BUS 5  // DS18B20 pin
 OneWire oneWire(ONE_WIRE_BUS);
 DallasTemperature DS18B20(&oneWire);
 
@@ -44,12 +44,42 @@ DallasTemperature DS18B20(&oneWire);
 char unameenc[USER_PWD_LEN];
 float oldTemp;
 
-const short int BUILTIN_LED1 = 16; 
+const short int BUILTIN_LED1 = 2; 
+
+void fadeIn() {
+  for(int i=0; i<150; i++) {
+      digitalWrite(BUILTIN_LED1, LOW); 
+      delay(i/5);
+      digitalWrite(BUILTIN_LED1, HIGH); 
+      delay((150-i)/5);
+  }
+}
+
+void fadeOut() {
+  for(int i=149; i>=0; i--) {
+      digitalWrite(BUILTIN_LED1, LOW); 
+      delay(i/5);
+      digitalWrite(BUILTIN_LED1, HIGH); 
+      delay((150-i)/5);
+  }
+}
 
 void setup() {
-  pinMode(BUILTIN_LED1, OUTPUT); // Initialize the BUILTIN_LED1 pin as an output 
+/*  for(;;) {
+  pinMode(D2, OUTPUT);
+  digitalWrite(D2, LOW); 
+  delay(3000);
+  pinMode(D2, OUTPUT);
+  digitalWrite(D2, HIGH); 
+  delay(3000);
+  }
+*/
   
   Serial.begin(115200);
+  Serial.setDebugOutput(true);
+  
+  pinMode(BUILTIN_LED1, OUTPUT); // Initialize the BUILTIN_LED1 pin as an output 
+  fadeIn();
 
  /*
   wifiConnect();
@@ -93,12 +123,18 @@ void loop() {
 
   int cnt = REPORT_INTERVAL;
   Serial.print("sleeping...");
+  /*
   while(cnt--) {
     Serial.print('*');
     delay(1000);
     Serial.print('#');
-    ESP.deepSleep( 10000, WAKE_RF_DISABLED );
+    // ESP.deepSleep( 10000, WAKE_RF_DISABLED );
+    ESP.deepSleep( 10000000, WAKE_RF_DEFAULT );
   }
+  */
+  fadeOut();
+  ESP.deepSleep( 10000000, WAKE_RF_DEFAULT );
+  
   Serial.println();
 
 
@@ -107,11 +143,13 @@ void loop() {
 void wifiConnect()
 {
    
+    WiFi.disconnect();
+    WiFi.mode( WIFI_OFF );
     WiFi.forceSleepWake();
-    delay( 1 );
+    delay( 1000 );
     
     // Bring up the WiFi connection
-    WiFi.persistent( false );
+    // WiFi.persistent( false );
     WiFi.mode( WIFI_STA );
     digitalWrite(BUILTIN_LED1, LOW); // Turn the LED ON by making the voltage LOW digitalWrite(BUILTIN_LED2, HIGH); // Turn the LED off by making the voltage HIGH
     // WiFi.begin( WLAN_SSID, WLAN_PASSWD );
@@ -121,9 +159,9 @@ void wifiConnect()
     Serial.print("Connecting to AP");
     Serial.println(AP_SSID);
     Serial.println(AP_PASSWORD);
-    IPAddress ip( 192, 168, 2, 51 ); 
-    IPAddress gateway( 192, 168, 2, 1 );
-    IPAddress subnet( 255, 255, 255, 0 );
+    //IPAddress ip( 192, 168, 2, 51 );   tylko do 5thElement
+    //IPAddress gateway( 192, 168, 2, 1 );
+    //IPAddress subnet( 255, 255, 255, 0 );
     // WiFi.config( ip, gateway, subnet );
     WiFi.begin(AP_SSID, AP_PASSWORD);
     int status;
@@ -135,8 +173,8 @@ void wifiConnect()
       Serial.print("[");
       Serial.print(status);
       Serial.print("]");
-    Serial.print("is connected: ");
-    Serial.println(WiFi.isConnected());
+    //Serial.print("is connected: ");
+    //Serial.println(WiFi.isConnected());
     }
 
   Serial.println("");
